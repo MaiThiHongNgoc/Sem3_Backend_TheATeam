@@ -1,83 +1,80 @@
-using backend.Data;
 using backend.Models;
+using backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace backend.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("api/ngos")]
-    public class NgoController : ControllerBase
+    public class NGOController : ControllerBase
     {
-        private readonly MyAppContext _context;
+        private readonly INGOService _ngoService;
 
-        public NgoController(MyAppContext context)
+        public NGOController(INGOService ngoService)
         {
-            _context = context;
+            _ngoService = ngoService;
         }
 
-        // Lấy danh sách tất cả NGOs
+        // Get all NGOs with optional search query (Admin, User, and NGO roles)
         [HttpGet]
-        [Authorize(Roles = "Admin,NGO")]
-        public async Task<IActionResult> GetAllNgos()
+        [Authorize(Roles = "Admin,User,NGO")]
+        public async Task<IActionResult> GetNGOs([FromQuery] string searchQuery = "")
         {
-            var ngos = await _context.NGOs.ToListAsync();
+            var ngos = await _ngoService.GetNGOsAsync(searchQuery);
             return Ok(ngos);
         }
 
-        // Lấy thông tin NGO theo ID
+        // Get NGO by Id (Admin, User, and NGO roles can access)
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,NGO")]
-        public async Task<IActionResult> GetNgoById(int id)
+        [Authorize(Roles = "Admin,User,NGO")]
+        public async Task<IActionResult> GetNGOById(int id)
         {
-            var ngo = await _context.NGOs.FindAsync(id);
+            var ngo = await _ngoService.GetNGOByIdAsync(id);
             if (ngo == null)
                 return NotFound("NGO not found.");
 
             return Ok(ngo);
         }
 
-        // Thêm mới một NGO
+        // Add NGO (Admin role only)
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateNgo([FromBody] NGO request)
+        public async Task<IActionResult> AddNGO([FromBody] NGO ngo)
         {
-            _context.NGOs.Add(request);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetNgoById), new { id = request.NGOId }, request);
+            if (ngo == null)
+                return BadRequest("NGO data is required.");
+
+            var addedNGO = await _ngoService.AddNGOAsync(ngo);
+            return CreatedAtAction(nameof(GetNGOById), new { id = addedNGO.NGOId }, addedNGO);
         }
 
-        // Cập nhật thông tin NGO
+        // Update NGO (Admin and NGO roles)
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin,NGO")]
-        public async Task<IActionResult> UpdateNgo(int id, [FromBody] NGO request)
+        public async Task<IActionResult> UpdateNGO(int id, [FromBody] NGO updatedNGO)
         {
-            var ngo = await _context.NGOs.FindAsync(id);
+            if (updatedNGO == null)
+                return BadRequest("Updated NGO data is required.");
+
+            var ngo = await _ngoService.UpdateNGOAsync(id, updatedNGO);
             if (ngo == null)
                 return NotFound("NGO not found.");
 
-            ngo.Name = request.Name;
-            ngo.Description = request.Description;
-            ngo.LogoUrl = request.LogoUrl;
-            ngo.UpdatedAt = DateTime.UtcNow;
-
-            await _context.SaveChangesAsync();
-            return Ok("NGO updated successfully.");
+            return Ok(ngo);
         }
 
-        // Xóa một NGO
+        // Delete NGO (Admin role only)
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteNgo(int id)
+        public async Task<IActionResult> DeleteNGO(int id)
         {
-            var ngo = await _context.NGOs.FindAsync(id);
-            if (ngo == null)
+            var result = await _ngoService.DeleteNGOAsync(id);
+            if (!result)
                 return NotFound("NGO not found.");
 
-            _context.NGOs.Remove(ngo);
-            await _context.SaveChangesAsync();
-            return Ok("NGO deleted successfully.");
+            return NoContent();
         }
     }
 }

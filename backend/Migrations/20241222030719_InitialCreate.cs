@@ -18,25 +18,6 @@ namespace backend.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Categories",
-                columns: table => new
-                {
-                    CategoryId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    CategoryName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Description = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Categories", x => x.CategoryId);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "NGOs",
                 columns: table => new
                 {
@@ -44,16 +25,51 @@ namespace backend.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Description = table.Column<string>(type: "longtext", nullable: false)
+                    Description = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    LogoUrl = table.Column<string>(type: "longtext", nullable: false)
+                    Code = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    LogoUrl = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Mission = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Team = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Careers = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Achievements = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsApproved = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_NGOs", x => x.NGOId);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Partners",
+                columns: table => new
+                {
+                    PartnerId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    LogoUrl = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Description = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsApproved = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Partners", x => x.PartnerId);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -73,97 +89,21 @@ namespace backend.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Causes",
-                columns: table => new
-                {
-                    CauseId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    CauseName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Description = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CategoryId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Causes", x => x.CauseId);
-                    table.ForeignKey(
-                        name: "FK_Causes_Categories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Categories",
-                        principalColumn: "CategoryId",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "BankAccounts",
-                columns: table => new
-                {
-                    BankAccountId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    NGOId = table.Column<int>(type: "int", nullable: false),
-                    BankName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    AccountNumber = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    AccountHolderName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BankAccounts", x => x.BankAccountId);
-                    table.ForeignKey(
-                        name: "FK_BankAccounts_NGOs_NGOId",
-                        column: x => x.NGOId,
-                        principalTable: "NGOs",
-                        principalColumn: "NGOId",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "Galleries",
-                columns: table => new
-                {
-                    ImageId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    NGOId = table.Column<int>(type: "int", nullable: false),
-                    ImageUrl = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Caption = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Galleries", x => x.ImageId);
-                    table.ForeignKey(
-                        name: "FK_Galleries_NGOs_NGOId",
-                        column: x => x.NGOId,
-                        principalTable: "NGOs",
-                        principalColumn: "NGOId",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "Program1s",
                 columns: table => new
                 {
                     ProgramId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     NGOId = table.Column<int>(type: "int", nullable: false),
-                    Title = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                    Name = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Description = table.Column<string>(type: "longtext", nullable: false)
+                    Description = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     StartDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    IsUpcoming = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
@@ -209,17 +149,49 @@ namespace backend.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "GalleryImages",
+                columns: table => new
+                {
+                    ImageId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    ProgramId = table.Column<int>(type: "int", nullable: false),
+                    ImageUrl = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Caption = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GalleryImages", x => x.ImageId);
+                    table.ForeignKey(
+                        name: "FK_GalleryImages_Program1s_ProgramId",
+                        column: x => x.ProgramId,
+                        principalTable: "Program1s",
+                        principalColumn: "ProgramId",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Customers",
                 columns: table => new
                 {
                     CustomerId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    FirstName = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    LastName = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    DateOfBirth = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     AccountId = table.Column<int>(type: "int", nullable: false),
+                    FirstName = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    LastName = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DateOfBirth = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "varchar(15)", maxLength: 15, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Address = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Gender = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
@@ -229,33 +201,6 @@ namespace backend.Migrations
                     table.PrimaryKey("PK_Customers", x => x.CustomerId);
                     table.ForeignKey(
                         name: "FK_Customers_Accounts_AccountId",
-                        column: x => x.AccountId,
-                        principalTable: "Accounts",
-                        principalColumn: "AccountId",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "Partners",
-                columns: table => new
-                {
-                    PartnerId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    CompanyName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    BankAccount = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    AccountId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Partners", x => x.PartnerId);
-                    table.ForeignKey(
-                        name: "FK_Partners_Accounts_AccountId",
                         column: x => x.AccountId,
                         principalTable: "Accounts",
                         principalColumn: "AccountId",
@@ -289,69 +234,59 @@ namespace backend.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Donations",
+                name: "Invitations",
                 columns: table => new
                 {
-                    DonationId = table.Column<int>(type: "int", nullable: false)
+                    InvitationId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    CustomerId = table.Column<int>(type: "int", nullable: false),
-                    CauseId = table.Column<int>(type: "int", nullable: false),
-                    NGOId = table.Column<int>(type: "int", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
-                    DonationDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    PaymentStatus = table.Column<string>(type: "longtext", nullable: false)
+                    SenderId = table.Column<int>(type: "int", nullable: false),
+                    RecipientEmail = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    DistributionStatus = table.Column<string>(type: "longtext", nullable: false)
+                    Message = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                    Status = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    SentAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Donations", x => x.DonationId);
+                    table.PrimaryKey("PK_Invitations", x => x.InvitationId);
                     table.ForeignKey(
-                        name: "FK_Donations_Causes_CauseId",
-                        column: x => x.CauseId,
-                        principalTable: "Causes",
-                        principalColumn: "CauseId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Donations_Customers_CustomerId",
-                        column: x => x.CustomerId,
+                        name: "FK_Invitations_Customers_SenderId",
+                        column: x => x.SenderId,
                         principalTable: "Customers",
                         principalColumn: "CustomerId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Donations_NGOs_NGOId",
-                        column: x => x.NGOId,
-                        principalTable: "NGOs",
-                        principalColumn: "NGOId",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "ProgramRegistrations",
+                name: "ProgramDonations",
                 columns: table => new
                 {
-                    RegistrationId = table.Column<int>(type: "int", nullable: false)
+                    DonationId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     ProgramId = table.Column<int>(type: "int", nullable: false),
-                    Program1ProgramId = table.Column<int>(type: "int", nullable: false),
                     CustomerId = table.Column<int>(type: "int", nullable: false),
-                    RegisteredAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                    Amount = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    PaymentStatus = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DonationDate = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProgramRegistrations", x => x.RegistrationId);
+                    table.PrimaryKey("PK_ProgramDonations", x => x.DonationId);
                     table.ForeignKey(
-                        name: "FK_ProgramRegistrations_Customers_CustomerId",
+                        name: "FK_ProgramDonations_Customers_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "Customers",
                         principalColumn: "CustomerId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ProgramRegistrations_Program1s_Program1ProgramId",
-                        column: x => x.Program1ProgramId,
+                        name: "FK_ProgramDonations_Program1s_ProgramId",
+                        column: x => x.ProgramId,
                         principalTable: "Program1s",
                         principalColumn: "ProgramId",
                         onDelete: ReferentialAction.Cascade);
@@ -359,56 +294,61 @@ namespace backend.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "FinancialStatements",
+                name: "Queries",
                 columns: table => new
                 {
-                    StatementId = table.Column<int>(type: "int", nullable: false)
+                    QueryId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    NGOId = table.Column<int>(type: "int", nullable: false),
-                    DonationId = table.Column<int>(type: "int", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
-                    StatementDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    Note = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                    CustomerId = table.Column<int>(type: "int", nullable: false),
+                    ProgramId = table.Column<int>(type: "int", nullable: false),
+                    Subject = table.Column<string>(type: "varchar(150)", maxLength: 150, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    QueryText = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ReplyText = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Status = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FinancialStatements", x => x.StatementId);
+                    table.PrimaryKey("PK_Queries", x => x.QueryId);
                     table.ForeignKey(
-                        name: "FK_FinancialStatements_Donations_DonationId",
-                        column: x => x.DonationId,
-                        principalTable: "Donations",
-                        principalColumn: "DonationId",
+                        name: "FK_Queries_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "CustomerId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_FinancialStatements_NGOs_NGOId",
-                        column: x => x.NGOId,
-                        principalTable: "NGOs",
-                        principalColumn: "NGOId",
+                        name: "FK_Queries_Program1s_ProgramId",
+                        column: x => x.ProgramId,
+                        principalTable: "Program1s",
+                        principalColumn: "ProgramId",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Payments",
+                name: "TransactionHistories",
                 columns: table => new
                 {
-                    PaymentId = table.Column<int>(type: "int", nullable: false)
+                    TransactionId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     DonationId = table.Column<int>(type: "int", nullable: false),
-                    PaymentMethod = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    PaymentReference = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
                     TransactionDate = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    TransactionDetails = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Payments", x => x.PaymentId);
+                    table.PrimaryKey("PK_TransactionHistories", x => x.TransactionId);
                     table.ForeignKey(
-                        name: "FK_Payments_Donations_DonationId",
+                        name: "FK_TransactionHistories_ProgramDonations_DonationId",
                         column: x => x.DonationId,
-                        principalTable: "Donations",
+                        principalTable: "ProgramDonations",
                         principalColumn: "DonationId",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -430,55 +370,20 @@ namespace backend.Migrations
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BankAccounts_NGOId",
-                table: "BankAccounts",
-                column: "NGOId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Causes_CategoryId",
-                table: "Causes",
-                column: "CategoryId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Customers_AccountId",
                 table: "Customers",
                 column: "AccountId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Donations_CauseId",
-                table: "Donations",
-                column: "CauseId");
+                name: "IX_GalleryImages_ProgramId",
+                table: "GalleryImages",
+                column: "ProgramId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Donations_CustomerId",
-                table: "Donations",
-                column: "CustomerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Donations_NGOId",
-                table: "Donations",
-                column: "NGOId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FinancialStatements_DonationId",
-                table: "FinancialStatements",
-                column: "DonationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FinancialStatements_NGOId",
-                table: "FinancialStatements",
-                column: "NGOId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Galleries_NGOId",
-                table: "Galleries",
-                column: "NGOId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Partners_AccountId",
-                table: "Partners",
-                column: "AccountId");
+                name: "IX_Invitations_SenderId",
+                table: "Invitations",
+                column: "SenderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PasswordResetTokens_AccountId",
@@ -486,37 +391,44 @@ namespace backend.Migrations
                 column: "AccountId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Payments_DonationId",
-                table: "Payments",
-                column: "DonationId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Program1s_NGOId",
                 table: "Program1s",
                 column: "NGOId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProgramRegistrations_CustomerId",
-                table: "ProgramRegistrations",
+                name: "IX_ProgramDonations_CustomerId",
+                table: "ProgramDonations",
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProgramRegistrations_Program1ProgramId",
-                table: "ProgramRegistrations",
-                column: "Program1ProgramId");
+                name: "IX_ProgramDonations_ProgramId",
+                table: "ProgramDonations",
+                column: "ProgramId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Queries_CustomerId",
+                table: "Queries",
+                column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Queries_ProgramId",
+                table: "Queries",
+                column: "ProgramId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TransactionHistories_DonationId",
+                table: "TransactionHistories",
+                column: "DonationId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "BankAccounts");
+                name: "GalleryImages");
 
             migrationBuilder.DropTable(
-                name: "FinancialStatements");
-
-            migrationBuilder.DropTable(
-                name: "Galleries");
+                name: "Invitations");
 
             migrationBuilder.DropTable(
                 name: "Partners");
@@ -525,31 +437,25 @@ namespace backend.Migrations
                 name: "PasswordResetTokens");
 
             migrationBuilder.DropTable(
-                name: "Payments");
+                name: "Queries");
 
             migrationBuilder.DropTable(
-                name: "ProgramRegistrations");
+                name: "TransactionHistories");
 
             migrationBuilder.DropTable(
-                name: "Donations");
-
-            migrationBuilder.DropTable(
-                name: "Program1s");
-
-            migrationBuilder.DropTable(
-                name: "Causes");
+                name: "ProgramDonations");
 
             migrationBuilder.DropTable(
                 name: "Customers");
 
             migrationBuilder.DropTable(
-                name: "NGOs");
-
-            migrationBuilder.DropTable(
-                name: "Categories");
+                name: "Program1s");
 
             migrationBuilder.DropTable(
                 name: "Accounts");
+
+            migrationBuilder.DropTable(
+                name: "NGOs");
 
             migrationBuilder.DropTable(
                 name: "Roles");

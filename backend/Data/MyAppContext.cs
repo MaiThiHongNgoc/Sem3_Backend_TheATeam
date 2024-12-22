@@ -10,17 +10,14 @@ namespace backend.Data {
         public DbSet<Customer> Customers { get; set; }
         public DbSet<PasswordResetToken> PasswordResetTokens {get; set;}
         public DbSet<Partner> Partners { get; set; }
-        public DbSet<Donation> Donations { get; set; }
-        public DbSet<Cause> Causes { get; set; }
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<Payment> Payments { get; set; }
         public DbSet<Program1> Program1s { get; set; }
-        public DbSet<ProgramRegistration> ProgramRegistrations { get; set; }
-        public DbSet<Gallery> Galleries { get; set; }
-        public DbSet<FinancialStatement> FinancialStatements { get; set; }
-        public DbSet<BankAccount> BankAccounts { get; set; }
+        public DbSet<ProgramDonation> ProgramDonations { get; set; }
+        public DbSet<GalleryImage> GalleryImages { get; set; }
         public DbSet<NGO> NGOs { get; set; }
         public DbSet<Query> Queries { get; set; }
+        public DbSet<Invitation> Invitations {get; set;}
+        public DbSet<TransactionHistory> TransactionHistories {get; set;}
+
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             // Seed default roles
             modelBuilder.Entity<Role>().HasData(

@@ -1,89 +1,80 @@
-using backend.Data;
 using backend.Models;
+using backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace backend.Controllers
 {
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("api/partners")]
     public class PartnerController : ControllerBase
     {
-        private readonly MyAppContext _context;
+        private readonly IPartnerService _partnerService;
 
-        public PartnerController(MyAppContext context)
+        public PartnerController(IPartnerService partnerService)
         {
-            _context = context;
+            _partnerService = partnerService;
         }
 
-        // Lấy danh sách tất cả Partners
+        // Get all Partners with optional search query (Admin, User, and NGO roles)
         [HttpGet]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAllPartners()
+        [Authorize(Roles = "Admin,User,NGO")]
+        public async Task<IActionResult> GetPartners([FromQuery] string searchQuery = "")
         {
-            var partners = await _context.Partners.Include(p => p.Account).ToListAsync();
+            var partners = await _partnerService.GetPartnersAsync(searchQuery);
             return Ok(partners);
         }
 
-        // Lấy thông tin Partner theo ID
+        // Get Partner by Id (Admin, User, and NGO roles can access)
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,Partner")]
+        [Authorize(Roles = "Admin,User,NGO")]
         public async Task<IActionResult> GetPartnerById(int id)
         {
-            var partner = await _context.Partners.Include(p => p.Account).FirstOrDefaultAsync(p => p.PartnerId == id);
+            var partner = await _partnerService.GetPartnerByIdAsync(id);
             if (partner == null)
                 return NotFound("Partner not found.");
 
-            // Kiểm tra quyền truy cập
-            if (User.IsInRole("Admin") || partner.Account.Email == User.Identity.Name)
-            {
-                return Ok(partner);
-            }
-
-            return Unauthorized("Bạn không có quyền truy cập.");
+            return Ok(partner);
         }
 
-        // Thêm mới một Partner
+        // Add Partner (Admin role only)
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreatePartner([FromBody] Partner request)
+        public async Task<IActionResult> AddPartner([FromBody] Partner partner)
         {
-            _context.Partners.Add(request);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetPartnerById), new { id = request.PartnerId }, request);
+            if (partner == null)
+                return BadRequest("Partner data is required.");
+
+            var addedPartner = await _partnerService.AddPartnerAsync(partner);
+            return CreatedAtAction(nameof(GetPartnerById), new { id = addedPartner.PartnerId }, addedPartner);
         }
 
-        // Cập nhật thông tin Partner
+        // Update Partner (Admin and NGO roles)
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin,Partner")]
-        public async Task<IActionResult> UpdatePartner(int id, [FromBody] Partner request)
+        [Authorize(Roles = "Admin,NGO")]
+        public async Task<IActionResult> UpdatePartner(int id, [FromBody] Partner updatedPartner)
         {
-            var partner = await _context.Partners.FindAsync(id);
+            if (updatedPartner == null)
+                return BadRequest("Updated Partner data is required.");
+
+            var partner = await _partnerService.UpdatePartnerAsync(id, updatedPartner);
             if (partner == null)
                 return NotFound("Partner not found.");
 
-            partner.CompanyName = request.CompanyName;
-            partner.BankAccount = request.BankAccount;
-            partner.UpdatedAt = DateTime.UtcNow;
-
-            await _context.SaveChangesAsync();
-            return Ok("Partner updated successfully.");
+            return Ok(partner);
         }
 
-        // Xóa một Partner
+        // Delete Partner (Admin role only)
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeletePartner(int id)
         {
-            var partner = await _context.Partners.FindAsync(id);
-            if (partner == null)
+            var result = await _partnerService.DeletePartnerAsync(id);
+            if (!result)
                 return NotFound("Partner not found.");
 
-            _context.Partners.Remove(partner);
-            await _context.SaveChangesAsync();
-            return Ok("Partner deleted successfully.");
+            return NoContent();
         }
     }
-
 }

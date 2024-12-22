@@ -2,22 +2,30 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace backend.Models {
-    public class Query {
+    public class Query
+    {
         [Key]
         public int QueryId { get; set; }
 
         public int CustomerId { get; set; }
-        public Customer Customer { get; set; }
+        [ForeignKey("CustomerId")]
+        public Customer Customer { get; set; } = null!;
 
-        [Required]
-        public string Subject { get; set; }
+        public int ProgramId { get; set; }
+        [ForeignKey("ProgramId")]
+        public Program1 Program1 { get; set; } = null!;
 
-        [Required]
-        public string Message { get; set; }
+        [MaxLength(150)]
+        public string Subject { get; set; } = null!;
 
-        public string Reply { get; set; }
+        public string QueryText { get; set; } = null!;
 
+        public string? ReplyText { get; set; }
+
+        public string Status { get; set; } = "Open";
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
+
 }

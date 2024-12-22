@@ -58,8 +58,11 @@ namespace backend.Controllers
                     {
                         FirstName = payload.GivenName,
                         LastName = payload.FamilyName,
+                        Gender = "Other", // Hoặc bạn có thể lấy thông tin từ payload nếu có.
                         DateOfBirth = DateTime.MinValue,
-                        Account = account
+                        Account = account,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
                     };
 
                     _context.Customers.Add(customer);
@@ -82,94 +85,6 @@ namespace backend.Controllers
                 return BadRequest("Đăng nhập Google thất bại: " + ex.InnerException?.Message ?? ex.Message);
             }
         }
-        // Đăng nhập/Đăng ký bằng Facebook
-        // [HttpPost("facebook")]
-        // public async Task<IActionResult> LoginWithFacebook([FromBody] FacebookLoginRequest request)
-        // {
-        //     try
-        //     {
-        //         // Kiểm tra nếu AccessToken không có giá trị
-        //         if (string.IsNullOrEmpty(request.AccessToken))
-        //         {
-        //             return BadRequest("Access token không hợp lệ.");
-        //         }
-
-        //         // Gửi yêu cầu tới Facebook để lấy thông tin người dùng
-        //         using var client = new HttpClient();
-        //         var url = $"https://graph.facebook.com/me?fields=id,first_name,last_name,email&access_token={request.AccessToken}";
-        //         var responseMessage = await client.GetAsync(url);
-
-        //         // Kiểm tra phản hồi của Facebook API
-        //         if (!responseMessage.IsSuccessStatusCode)
-        //         {
-        //             return StatusCode((int)responseMessage.StatusCode, "Lỗi khi kết nối với Facebook API.");
-        //         }
-
-        //         var responseContent = await responseMessage.Content.ReadAsStringAsync();
-        //         Console.WriteLine($"Facebook API response: {responseContent}");
-
-        //         // Deserialize phản hồi JSON từ Facebook
-        //         var facebookUser = JsonConvert.DeserializeObject<FacebookUser>(responseContent);
-        //         if (facebookUser == null || string.IsNullOrEmpty(facebookUser.Email))
-        //         {
-        //             return BadRequest("Không thể xác thực tài khoản Facebook. Email không hợp lệ.");
-        //         }
-
-        //         // Kiểm tra người dùng đã tồn tại trong hệ thống
-        //         var account = await _context.Accounts
-        //             .Include(a => a.Role)
-        //             .FirstOrDefaultAsync(a => a.Email == facebookUser.Email);
-
-        //         if (account == null)
-        //         {
-        //             // Tạo tài khoản mới nếu người dùng chưa tồn tại
-        //             account = new Account
-        //             {
-        //                 Email = facebookUser.Email,
-        //                 Username = $"{facebookUser.FirstName} {facebookUser.LastName}",
-        //                 Password = string.Empty, // Không cần mật khẩu khi đăng nhập qua Facebook
-        //                 RoleId = userRole.RoleId, // Giả định RoleId = 2 là User
-        //                 IsActive = true
-        //             };
-
-        //             _context.Accounts.Add(account);
-        //             await _context.SaveChangesAsync();
-
-        //             // Tạo đối tượng Customer
-        //             var customer = new Customer
-        //             {
-        //                 FirstName = facebookUser.FirstName,
-        //                 LastName = facebookUser.LastName,
-        //                 DateOfBirth = DateTime.MinValue, // Không có thông tin về ngày sinh
-        //                 Account = account
-        //             };
-
-        //             _context.Customers.Add(customer);
-        //             await _context.SaveChangesAsync();
-
-        //             // Gửi email chào mừng người dùng
-        //             var emailBody = $"Chào {facebookUser.FirstName} {facebookUser.LastName},\n\nCảm ơn bạn đã đăng ký tài khoản tại MyApp qua Facebook!";
-        //             if (!SendEmail(facebookUser.Email, "Chào mừng đến với MyApp", emailBody))
-        //             {
-        //                 Console.WriteLine("Cảnh báo: Lỗi khi gửi email chào mừng.");
-        //             }
-
-        //             // Tạo JWT token cho tài khoản mới
-        //             var token = GenerateJwtToken(account);
-        //             return Ok(new { Token = token, AccountId = account.AccountId });
-        //         }
-
-        //         // Nếu người dùng đã tồn tại, tạo JWT token và trả về
-        //         var existingToken = GenerateJwtToken(account);
-        //         return Ok(new { Token = existingToken, AccountId = account.AccountId });
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         // Log lỗi chi tiết
-        //         Console.WriteLine($"Error: {ex.Message}\n{ex.StackTrace}");
-        //         return StatusCode(500, $"Đã xảy ra lỗi: {ex.Message}");
-        //     }
-        // }
 
         // Đăng ký
         [HttpPost("register")]
@@ -196,7 +111,10 @@ namespace backend.Controllers
                 FirstName = request.FirstName,
                 LastName = request.LastName,
                 DateOfBirth = request.DateOfBirth,
-                Account = account
+                Gender = "Other", // Hoặc bạn có thể lấy thông tin từ payload nếu có.
+                Account = account,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             };
 
             _context.Customers.Add(customer);
@@ -376,50 +294,5 @@ namespace backend.Controllers
         }
 
     }
-    public class RegisterRequest
-    {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public DateTime DateOfBirth { get; set; }
-        public string Email { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-    }
-    public class LoginRequest
-    {
-        public string EmailOrUsername { get; set; }
-        public string Password { get; set; }
-    }
-    public class ForgotPasswordRequest
-    {
-        public string Email { get; set; }
-    }
-    public class ResetPasswordRequest
-    {
-        public string Token { get; set; }
-        public string NewPassword { get; set; }
-    }
-    public class UpdateCustomerRequest
-    {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public DateTime DateOfBirth { get; set; }
-    }
-    public class GoogleLoginRequest
-    {
-        public string IdToken { get; set; }
-    }
-    public class FacebookUser
-    {
-        public string Id { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
-    }
-
-    // Mô hình yêu cầu từ frontend
-    public class FacebookLoginRequest
-    {
-        public string AccessToken { get; set; }
-    }
+    
 }
