@@ -1,12 +1,14 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace backend.Models {
+namespace backend.Models
+{
     public class Program1
     {
         [Key]
         public int ProgramId { get; set; }
 
+        [Required]  // Ensure NGOId is required
         public int NGOId { get; set; }
         [ForeignKey("NGOId")]
         public NGO NGO { get; set; } = null!;

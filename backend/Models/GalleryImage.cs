@@ -13,6 +13,7 @@ namespace backend.Models {
 
         [MaxLength(255)]
         public string ImageUrl { get; set; } = null!;
+        public string FileName { get; set; } = null!;
 
         public string? Caption { get; set; }
 

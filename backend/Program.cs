@@ -1,4 +1,4 @@
-using backend.Services; // Make sure to include this for your services
+using backend.Services;
 using backend.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Facebook;
 using backend.Config;
 using System.Text;
+using backend.Filters;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,9 +21,17 @@ builder.Services.AddDbContext<MyAppContext>(options =>
     new MySqlServerVersion(new Version(8, 0, 21))));
 
 // Register your services for DI
-builder.Services.AddScoped<ICustomerService, CustomerService>();  // Register your ICustomerService
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<INGOService, NGOService>();
+builder.Services.AddScoped<IGalleryImageService, GalleryImageService>();
+builder.Services.AddScoped<IProgram1Service, Program1Service>();
+builder.Services.AddScoped<IProgramDonationService, ProgramDonationService>();
+builder.Services.AddScoped<IInvitationService, InvitationService>();
+builder.Services.AddScoped<IPartnerService, PartnerService>();
+builder.Services.AddScoped<IQueryService, QueryService>();
+builder.Services.AddScoped<ITransactionHistoryService, TransactionHistoryService>();
 
-// Configure JWT Authentication
+// Configure Authorization Policies
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
@@ -29,28 +39,26 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("NGOPolicy", policy => policy.RequireRole("NGO"));
 });
 
+// Configure JWT Authentication
 var key = Encoding.UTF8.GetBytes(configuration["Jwt:Key"]);
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = configuration["Jwt:Issuer"],
-            ValidAudience = configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-            RoleClaimType = "Role"
-        };
-    });
-
-// Configure Google and Facebook Authentication
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = configuration["Jwt:Issuer"],
+        ValidAudience = configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        RoleClaimType = "Role"
+    };
 })
 .AddGoogle(options =>
 {
@@ -75,11 +83,13 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
-// Add Controllers
+// Add Controllers with JSON Options
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -89,32 +99,37 @@ builder.Services.AddControllers()
 
 // Configure Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.OperationFilter<FileUploadOperationFilter>();
+    options.MapType<IFormFile>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Format = "binary"
+    });
+});
+
+
+// Add Logging
 builder.Logging.AddConsole();
 
 var app = builder.Build();
 
-// Set up Swagger in Development
+// Configure Middleware Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// Use CORS
-app.UseCors("AllowAll");
-
-// Middleware setup
 app.UseHttpsRedirection();
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Map Controllers
 app.MapControllers();
 
-// Run the application
 app.Run();
-
 
 
 

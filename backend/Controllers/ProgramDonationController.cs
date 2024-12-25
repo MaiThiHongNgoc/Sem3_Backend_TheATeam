@@ -35,7 +35,16 @@ namespace backend.Controllers
             if (donation == null)
                 return NotFound("Donation not found.");
 
-            return Ok(donation);
+            return Ok(new
+            {
+                donation.DonationId,
+                donation.Amount,
+                donation.TargetAmount,
+                donation.PaymentStatus,
+                donation.RemainingAmount,
+                donation.ExcessAmount,
+                donation.PercentageAchieved
+            });
         }
 
         // Add Program Donation (Admin and NGO roles)
