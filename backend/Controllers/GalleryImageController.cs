@@ -24,7 +24,6 @@ namespace backend.Controllers
 
         // Get all GalleryImages with optional search query (Admin, User, and NGO roles)
         [HttpGet]
-        [Authorize(Roles = "Admin,User,NGO")]
         public async Task<IActionResult> GetGalleryImages([FromQuery] string searchQuery = "")
         {
             var galleryImages = await _galleryImageService.GetGalleryImagesAsync(searchQuery);
@@ -33,7 +32,6 @@ namespace backend.Controllers
 
         // Get GalleryImage by Id (Admin, User, and NGO roles can access)
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,User,NGO")]
         public async Task<IActionResult> GetGalleryImageById(int id)
         {
             var galleryImage = await _galleryImageService.GetGalleryImageByIdAsync(id);

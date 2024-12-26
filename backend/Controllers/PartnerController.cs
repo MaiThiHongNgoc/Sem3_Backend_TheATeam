@@ -19,7 +19,6 @@ namespace backend.Controllers
 
         // Get all Partners with optional search query (Admin, User, and NGO roles)
         [HttpGet]
-        [Authorize(Roles = "Admin,User,NGO")]
         public async Task<IActionResult> GetPartners([FromQuery] string searchQuery = "")
         {
             var partners = await _partnerService.GetPartnersAsync(searchQuery);
@@ -28,7 +27,6 @@ namespace backend.Controllers
 
         // Get Partner by Id (Admin, User, and NGO roles can access)
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,User,NGO")]
         public async Task<IActionResult> GetPartnerById(int id)
         {
             var partner = await _partnerService.GetPartnerByIdAsync(id);

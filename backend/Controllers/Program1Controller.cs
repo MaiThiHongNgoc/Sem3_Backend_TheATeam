@@ -17,18 +17,16 @@ namespace backend.Controllers
             _program1Service = program1Service;
         }
 
-        // Get all Program1s with optional search query (Admin, User, and NGO roles)
+        // Get all Program1s with optional search query and pagination (Admin, User, and NGO roles)
         [HttpGet]
-        [Authorize(Roles = "Admin,User,NGO")]
-        public async Task<IActionResult> GetProgram1s([FromQuery] string searchQuery = "")
+        public async Task<IActionResult> GetProgram1s([FromQuery] string searchQuery = "", [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var programs = await _program1Service.GetProgram1sAsync(searchQuery);
+            var programs = await _program1Service.GetProgram1sAsync(searchQuery, page, pageSize);
             return Ok(programs);
         }
 
-        // Get Program1 by Id (Admin, User, and NGO roles can access)
+        // Get Program1 by Id (Admin, User, and NGO roles)
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,User,NGO")]
         public async Task<IActionResult> GetProgram1ById(int id)
         {
             var program = await _program1Service.GetProgram1ByIdAsync(id);
@@ -43,11 +41,25 @@ namespace backend.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddProgram1([FromBody] Program1 program)
         {
-            if (program == null)
-                return BadRequest("Program data is required.");
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            var addedProgram = await _program1Service.AddProgram1Async(program);
-            return CreatedAtAction(nameof(GetProgram1ById), new { id = addedProgram.ProgramId }, addedProgram);
+                if (program == null)
+                    return BadRequest("Program data is required.");
+
+                var addedProgram = await _program1Service.AddProgram1Async(program);
+                return CreatedAtAction(nameof(GetProgram1ById), new { id = addedProgram.ProgramId }, addedProgram);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "An unexpected error occurred.");
+            }
         }
 
         // Update Program1 (Admin and NGO roles)
@@ -55,14 +67,28 @@ namespace backend.Controllers
         [Authorize(Roles = "Admin,NGO")]
         public async Task<IActionResult> UpdateProgram1(int id, [FromBody] Program1 updatedProgram)
         {
-            if (updatedProgram == null)
-                return BadRequest("Updated Program data is required.");
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            var program = await _program1Service.UpdateProgram1Async(id, updatedProgram);
-            if (program == null)
-                return NotFound("Program not found.");
+                if (updatedProgram == null)
+                    return BadRequest("Updated Program data is required.");
 
-            return Ok(program);
+                var program = await _program1Service.UpdateProgram1Async(id, updatedProgram);
+                if (program == null)
+                    return NotFound("Program not found.");
+
+                return Ok(program);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "An unexpected error occurred.");
+            }
         }
 
         // Delete Program1 (Admin role only)

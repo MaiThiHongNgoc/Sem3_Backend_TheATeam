@@ -19,7 +19,6 @@ namespace backend.Controllers
 
         // Get all Program Donations with optional search query (Admin, User, and NGO roles)
         [HttpGet]
-        [Authorize(Roles = "Admin,User,NGO")]
         public async Task<IActionResult> GetProgramDonations([FromQuery] string searchQuery = "")
         {
             var donations = await _programDonationService.GetProgramDonationsAsync(searchQuery);
@@ -28,7 +27,6 @@ namespace backend.Controllers
 
         // Get Program Donation by Id (Admin, User, and NGO roles can access)
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,User,NGO")]
         public async Task<IActionResult> GetProgramDonationById(int id)
         {
             var donation = await _programDonationService.GetProgramDonationByIdAsync(id);

@@ -11,7 +11,7 @@ namespace backend.Models
         [Required]  // Ensure NGOId is required
         public int NGOId { get; set; }
         [ForeignKey("NGOId")]
-        public NGO NGO { get; set; } = null!;
+        public NGO? NGO { get; set; }
 
         [MaxLength(100)]
         public string Name { get; set; } = null!;

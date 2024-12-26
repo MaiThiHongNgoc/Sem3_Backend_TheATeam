@@ -19,7 +19,6 @@ namespace backend.Controllers
 
         // Get all NGOs with optional search query (Admin, User, and NGO roles)
         [HttpGet]
-        [Authorize(Roles = "Admin,User,NGO")]
         public async Task<IActionResult> GetNGOs([FromQuery] string searchQuery = "")
         {
             var ngos = await _ngoService.GetNGOsAsync(searchQuery);
@@ -28,7 +27,6 @@ namespace backend.Controllers
 
         // Get NGO by Id (Admin, User, and NGO roles can access)
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,User,NGO")]
         public async Task<IActionResult> GetNGOById(int id)
         {
             var ngo = await _ngoService.GetNGOByIdAsync(id);

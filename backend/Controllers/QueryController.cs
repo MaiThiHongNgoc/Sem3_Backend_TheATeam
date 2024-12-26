@@ -27,7 +27,6 @@ namespace backend.Controllers
 
         // Get Query by Id (Admin, NGO, and Customer roles can access their own queries)
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,NGO,User")]
         public async Task<IActionResult> GetQueryById(int id)
         {
             var query = await _queryService.GetQueryByIdAsync(id);

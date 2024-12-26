@@ -16,6 +16,10 @@ namespace backend.Services
         // Add Program1
         public async Task<Program1> AddProgram1Async(Program1 program)
         {
+            var ngoExists = await _context.NGOs.AnyAsync(n => n.NGOId == program.NGOId);
+            if (!ngoExists)
+                throw new InvalidOperationException("The specified NGO does not exist.");
+
             _context.Program1s.Add(program);
             await _context.SaveChangesAsync();
             return program;
@@ -25,7 +29,12 @@ namespace backend.Services
         public async Task<Program1> UpdateProgram1Async(int id, Program1 updatedProgram)
         {
             var program = await _context.Program1s.FindAsync(id);
-            if (program == null) return null;
+            if (program == null)
+                return null;
+
+            var ngoExists = await _context.NGOs.AnyAsync(n => n.NGOId == updatedProgram.NGOId);
+            if (!ngoExists)
+                throw new InvalidOperationException("The specified NGO does not exist.");
 
             program.Name = updatedProgram.Name;
             program.Description = updatedProgram.Description;
@@ -49,8 +58,8 @@ namespace backend.Services
             return true;
         }
 
-        // Get all Program1s with optional search query
-        public async Task<List<Program1>> GetProgram1sAsync(string searchQuery = "")
+        // Get all Program1s with optional search query and pagination
+        public async Task<List<Program1>> GetProgram1sAsync(string searchQuery = "", int page = 1, int pageSize = 10)
         {
             var query = _context.Program1s.Include(p => p.NGO).AsQueryable();
 
@@ -59,7 +68,7 @@ namespace backend.Services
                 query = query.Where(p => p.Name.Contains(searchQuery) || p.Description.Contains(searchQuery));
             }
 
-            return await query.ToListAsync();
+            return await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
         }
 
         // Get Program1 by Id
@@ -76,7 +85,7 @@ namespace backend.Services
         Task<Program1> AddProgram1Async(Program1 program);
         Task<Program1> UpdateProgram1Async(int id, Program1 updatedProgram);
         Task<bool> DeleteProgram1Async(int id);
-        Task<List<Program1>> GetProgram1sAsync(string searchQuery = "");
+        Task<List<Program1>> GetProgram1sAsync(string searchQuery = "", int page = 1, int pageSize = 10);
         Task<Program1?> GetProgram1ByIdAsync(int id);
     }
 }

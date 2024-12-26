@@ -18,7 +18,6 @@ namespace backend.Controllers
 
         // Get all TransactionHistories with optional search query (Admin, User, and NGO roles)
         [HttpGet]
-        [Authorize(Roles = "Admin,User,NGO")]
         public async Task<IActionResult> GetTransactionHistories([FromQuery] string searchQuery = "")
         {
             var transactionHistories = await _transactionHistoryService.GetTransactionHistoriesAsync(searchQuery);
@@ -27,7 +26,6 @@ namespace backend.Controllers
 
         // Get TransactionHistory by Id (Admin, User, and NGO roles can access)
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,User,NGO")]
         public async Task<IActionResult> GetTransactionHistoryById(int id)
         {
             var transactionHistory = await _transactionHistoryService.GetTransactionHistoryByIdAsync(id);

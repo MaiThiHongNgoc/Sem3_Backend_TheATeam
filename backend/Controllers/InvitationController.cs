@@ -19,7 +19,6 @@ namespace backend.Controllers
 
         // Get all Invitations with optional search query (Admin, User, and NGO roles)
         [HttpGet]
-        [Authorize(Roles = "Admin,User,NGO")]
         public async Task<IActionResult> GetInvitations([FromQuery] string searchQuery = "")
         {
             var invitations = await _invitationService.GetInvitationsAsync(searchQuery);
@@ -28,7 +27,6 @@ namespace backend.Controllers
 
         // Get Invitation by Id (Admin, User, and NGO roles can access)
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,User,NGO")]
         public async Task<IActionResult> GetInvitationById(int id)
         {
             var invitation = await _invitationService.GetInvitationByIdAsync(id);
