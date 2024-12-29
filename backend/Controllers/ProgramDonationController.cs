@@ -45,7 +45,6 @@ namespace backend.Controllers
 
         // Add Program Donation (Admin and NGO roles)
         [HttpPost]
-        [Authorize(Roles = "Admin,NGO")]
         public async Task<IActionResult> AddProgramDonation([FromBody] ProgramDonation donation)
         {
             if (donation == null)

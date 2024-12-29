@@ -10,11 +10,11 @@ namespace backend.Models
 
         public int ProgramId { get; set; }
         [ForeignKey("ProgramId")]
-        public Program1 Program1 { get; set; } = null!;
+        public Program1? Program1 { get; set; }
 
         public int CustomerId { get; set; }
         [ForeignKey("CustomerId")]
-        public Customer Customer { get; set; } = null!;
+        public Customer? Customer { get; set; }
 
         public decimal Amount { get; set; }  // Số tiền đã đóng góp
 

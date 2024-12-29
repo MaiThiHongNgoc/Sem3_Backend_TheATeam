@@ -27,6 +27,7 @@ namespace backend.Controllers
             _context = context;
             _config = config;
         }
+
         // Đăng ký/Đăng nhập bằng Google
         [HttpPost("google")]
         public async Task<IActionResult> LoginWithGoogle([FromBody] GoogleLoginRequest request)
@@ -294,5 +295,5 @@ namespace backend.Controllers
         }
 
     }
-    
+
 }

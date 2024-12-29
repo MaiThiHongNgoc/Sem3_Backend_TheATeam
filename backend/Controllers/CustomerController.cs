@@ -2,7 +2,7 @@ using backend.Models;
 using backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace backend.Controllers
@@ -17,7 +17,7 @@ namespace backend.Controllers
         {
             _customerService = customerService;
         }
-        // Get all Customers (Admin only)
+
         [HttpGet("all")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllCustomers()
@@ -26,8 +26,37 @@ namespace backend.Controllers
             return Ok(customers);
         }
 
+        [HttpGet("get-customer-data")]
+        public IActionResult GetCustomerData()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity == null) return Unauthorized();
 
-        // Add Customer (Admin only)
+            var accountIdClaim = identity.FindFirst("id");
+            if (accountIdClaim == null)
+            {
+                Console.WriteLine("Token không chứa claim 'id'.");
+                return NotFound("AccountId không tồn tại trong token.");
+            }
+
+            if (!int.TryParse(accountIdClaim.Value, out var accountId))
+            {
+                Console.WriteLine("AccountId trong token không hợp lệ.");
+                return BadRequest("AccountId không hợp lệ.");
+            }
+
+            var customer = _customerService.GetCustomerByAccountId(accountId);
+            if (customer == null)
+            {
+                Console.WriteLine($"Không tìm thấy khách hàng với AccountId: {accountId}");
+                return NotFound("Không tìm thấy thông tin khách hàng.");
+            }
+
+            Console.WriteLine($"Tìm thấy khách hàng: {customer.CustomerId}");
+            return Ok(customer);
+        }
+
+
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddCustomer([FromBody] Customer customer)
@@ -39,7 +68,6 @@ namespace backend.Controllers
             return CreatedAtAction(nameof(GetCustomerById), new { id = addedCustomer.CustomerId }, addedCustomer);
         }
 
-        // Update Customer (Admin only)
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateCustomer(int id, [FromBody] Customer updatedCustomer)
@@ -54,7 +82,6 @@ namespace backend.Controllers
             return Ok(customer);
         }
 
-        // Delete Customer (Admin only)
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteCustomer(int id)
@@ -66,7 +93,6 @@ namespace backend.Controllers
             return NoContent();
         }
 
-        // Get Customer by Id (Admin and User can access)
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin,User")]
         public async Task<IActionResult> GetCustomerById(int id)
@@ -78,7 +104,6 @@ namespace backend.Controllers
             return Ok(customer);
         }
 
-        // Get Customers with optional search query (Admin and User can access)
         [HttpGet]
         [Authorize(Roles = "Admin,User")]
         public async Task<IActionResult> GetCustomers([FromQuery] string searchQuery = "")

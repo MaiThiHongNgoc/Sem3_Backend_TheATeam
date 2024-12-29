@@ -77,6 +77,10 @@ namespace backend.Services
 
             return await query.ToListAsync();
         }
+        public Customer GetCustomerByAccountId(int accountId)
+        {
+            return _context.Customers.FirstOrDefault(c => c.AccountId == accountId);
+        }
     }
 
     public interface ICustomerService
@@ -87,5 +91,6 @@ namespace backend.Services
         Task<Customer?> GetCustomerByIdAsync(int id);
         Task<List<Customer>> GetCustomersAsync(string searchQuery = "");
         Task<List<Customer>> GetAllCustomersAsync();
+        Customer GetCustomerByAccountId(int accountId);
     }
 }
