@@ -2,7 +2,6 @@ using backend.Models;
 using backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace backend.Controllers
 {
@@ -37,11 +36,10 @@ namespace backend.Controllers
             {
                 donation.DonationId,
                 donation.Amount,
-                donation.TargetAmount,
                 donation.PaymentStatus,
-                donation.RemainingAmount,
-                donation.ExcessAmount,
-                donation.PercentageAchieved
+                donation.DonationDate,
+                Program = donation.Program1.Name,
+                Customer = donation.Customer.FirstName + " " + donation.Customer.LastName
             });
         }
 

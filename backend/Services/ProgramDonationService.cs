@@ -29,7 +29,6 @@ namespace backend.Services
 
             donation.Amount = updatedDonation.Amount;
             donation.PaymentStatus = updatedDonation.PaymentStatus;
-            donation.TargetAmount = updatedDonation.TargetAmount;  // Cập nhật số tiền mục tiêu
             donation.DonationDate = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();

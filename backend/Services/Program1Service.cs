@@ -41,6 +41,7 @@ namespace backend.Services
             program.StartDate = updatedProgram.StartDate;
             program.EndDate = updatedProgram.EndDate;
             program.IsUpcoming = updatedProgram.IsUpcoming;
+            program.TargetAmount = updatedProgram.TargetAmount;
             program.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -76,6 +77,8 @@ namespace backend.Services
         {
             return await _context.Program1s
                 .Include(p => p.NGO)
+                .Include(p => p.Donations)
+                .Include(p => p.GalleryImages)
                 .FirstOrDefaultAsync(p => p.ProgramId == id);
         }
     }
