@@ -62,14 +62,15 @@ namespace backend.Services
         // Get all Program1s with optional search query and pagination
         public async Task<List<Program1>> GetProgram1sAsync(string searchQuery = "", int page = 1, int pageSize = 10)
         {
-            var query = _context.Program1s.Include(p => p.NGO).AsQueryable();
+            // var query = _context.Program1s.Include(p => p.NGO).AsQueryable();
 
-            if (!string.IsNullOrEmpty(searchQuery))
-            {
-                query = query.Where(p => p.Name.Contains(searchQuery) || p.Description.Contains(searchQuery));
-            }
+            // if (!string.IsNullOrEmpty(searchQuery))
+            // {
+            //     query = query.Where(p => p.Name.Contains(searchQuery) || p.Description.Contains(searchQuery));
+            // }
+            
 
-            return await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            return await _context.Program1s.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
         }
 
         // Get Program1 by Id
