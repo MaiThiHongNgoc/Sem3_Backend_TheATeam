@@ -14,7 +14,9 @@ namespace backend.Services
         }
         public async Task<List<Customer>> GetAllCustomersAsync()
         {
-            return await _context.Customers.ToListAsync();
+            return await _context.Customers
+                .Include(c => c.Account) // Bao gồm dữ liệu của Account
+                .ToListAsync();
         }
 
 
