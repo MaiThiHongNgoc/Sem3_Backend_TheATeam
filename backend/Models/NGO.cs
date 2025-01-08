@@ -40,19 +40,7 @@ namespace backend.Models
 
         // Link to Account
         public int AccountId { get; set; }
-        public Account Account { get; set; } = null!;
-
-        // Constructor to initialize default account
-        public NGO()
-        {
-            Account = new Account
-            {
-                Email = Email, // Use the provided NGO email
-                Username = Code, // Default username based on NGO Code
-                Password = "DefaultPassword123", // Default password (to be updated later)
-                IsActive = true,
-                RoleId = 3 // Assume RoleId 3 is for NGOs
-            };
-        }
+        [ForeignKey("AccountId")]
+        public Account? Account { get; set; }
     }
 }

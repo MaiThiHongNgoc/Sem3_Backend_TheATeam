@@ -16,9 +16,9 @@ namespace backend.Models{
         public bool IsActive { get; set; } = true;
 
         public int RoleId { get; set; }
-        public Role Role { get; set; }
+        public Role? Role { get; set; }
 
-        public Customer Customer { get; set; }
+        public Customer? Customer { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

@@ -19,25 +19,37 @@ namespace backend.Services
             if (string.IsNullOrWhiteSpace(ngo.Email))
                 throw new ArgumentException("Email is required.");
 
-            if (await _context.Accounts.AnyAsync(a => a.Email.Equals(ngo.Email, StringComparison.OrdinalIgnoreCase)))
+            // Use EF.Functions.Like for case-insensitive email comparison
+            if (await _context.Accounts.AnyAsync(a => EF.Functions.Like(a.Email, ngo.Email)))
                 throw new InvalidOperationException("Email is already in use.");
 
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                // Fetch the role for NGOs (assuming RoleId 3 corresponds to NGOs)
+                var role = await _context.Roles.FindAsync(3);
+                if (role == null)
+                    throw new InvalidOperationException("Role not found.");
+
+                // Create an account with the fetched Role
                 var account = new Account
                 {
                     Email = ngo.Email,
                     Username = ngo.Code,
-                    Password = HashPassword("DefaultPassword123"),
+                    Password = BCrypt.Net.BCrypt.HashPassword("DefaultPassword123"), // Ensure this method is correct
                     IsActive = true,
-                    RoleId = 3
+                    Role = role,
+                    Customer = null
                 };
 
+                // Add the account and save changes to get the generated AccountId
                 _context.Accounts.Add(account);
                 await _context.SaveChangesAsync();
 
+                // Set the AccountId in the NGO object
                 ngo.AccountId = account.AccountId;
+
+                // Add the NGO and save changes
                 _context.NGOs.Add(ngo);
                 await _context.SaveChangesAsync();
 
@@ -75,7 +87,7 @@ namespace backend.Services
                 if (_context.Accounts.Any(a => a.Email == updatedNGO.Email))
                     throw new InvalidOperationException("Email is already in use.");
 
-                ngo.Account.Email = updatedNGO.Email;
+                ngo.Account.Email = updatedNGO.Email; // Update Account email
             }
 
             ngo.UpdatedAt = DateTime.UtcNow;
