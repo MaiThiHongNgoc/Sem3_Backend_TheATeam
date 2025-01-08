@@ -386,3 +386,4 @@ C:\Users\ADMIN\Documents\Sem3_Backend_TheATeam\backend\obj\Debug\net8.0\refint\b
 C:\Users\ADMIN\Documents\Sem3_Backend_TheATeam\backend\obj\Debug\net8.0\backend.pdb
 C:\Users\ADMIN\Documents\Sem3_Backend_TheATeam\backend\obj\Debug\net8.0\backend.genruntimeconfig.cache
 C:\Users\ADMIN\Documents\Sem3_Backend_TheATeam\backend\obj\Debug\net8.0\ref\backend.dll
+C:\Users\ADMIN\Documents\Sem3_Backend_TheATeam\backend\bin\Debug\net8.0\backend.staticwebassets.runtime.json

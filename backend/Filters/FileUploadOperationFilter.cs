@@ -7,31 +7,17 @@ namespace backend.Filters
     {
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
-            foreach (var parameter in operation.Parameters.ToList())
+            if (operation.RequestBody != null && operation.RequestBody.Content.ContainsKey("multipart/form-data"))
             {
-                // Check if the parameter is of type IFormFile
-                if (parameter.Name == "imageFile" && parameter.Schema.Type == "string" && parameter.Schema.Format == "binary")
+                operation.RequestBody.Content["multipart/form-data"].Schema.Properties["imageFile"] = new OpenApiSchema
                 {
-                    parameter.Description = "File upload";
-                    parameter.Schema.Type = "string";
-                    parameter.Schema.Format = "binary";
-                    parameter.Content = new Dictionary<string, OpenApiMediaType>
-                {
-                    {
-                        "multipart/form-data", new OpenApiMediaType
-                        {
-                            Schema = new OpenApiSchema
-                            {
-                                Type = "string",
-                                Format = "binary"
-                            }
-                        }
-                    }
+                    Type = "string",
+                    Format = "binary",
+                    Description = "The image file to upload"
                 };
-                }
             }
         }
-    }
 
+    }
 
 }

@@ -9,10 +9,10 @@ namespace backend.Models {
 
         public int ProgramId { get; set; }
         [ForeignKey("ProgramId")]
-        public Program1 Program1 { get; set; } = null!;
+        public Program1? Program1 { get; set; } 
 
         [MaxLength(255)]
-        public string ImageUrl { get; set; } = null!;
+        public string? ImageUrl { get; set; }
         public string FileName { get; set; } = null!;
 
         public string? Caption { get; set; }

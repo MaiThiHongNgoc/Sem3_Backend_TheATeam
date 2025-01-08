@@ -45,37 +45,31 @@ namespace backend.Controllers
             return Ok(galleryImage);
         }
 
-        // Add GalleryImage (Admin, NGO roles)
         [HttpPost]
         [Authorize(Roles = "Admin,NGO")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> AddGalleryImage([FromForm] IFormFile imageFile, [FromForm] string caption)
+        public async Task<IActionResult> AddGalleryImage([FromForm] IFormFile imageFile, [FromForm] string? caption, [FromForm] int programId)
         {
             if (imageFile == null || imageFile.Length == 0)
                 return BadRequest("No image file provided.");
 
-            // Generate a unique file name to avoid conflicts
-            var fileName = Path.GetFileNameWithoutExtension(imageFile.FileName) + "_" + Guid.NewGuid() + Path.GetExtension(imageFile.FileName);
-            var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", fileName);
-
-            // Save the image to the server
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            try
             {
-                await imageFile.CopyToAsync(stream);
+                // Gọi service để thêm hình ảnh vào database
+                var addedGalleryImage = await _galleryImageService.AddGalleryImageAsync(imageFile, caption, programId);
+
+                // Trả về kết quả
+                return CreatedAtAction(nameof(GetGalleryImageById), new { id = addedGalleryImage.ImageId }, addedGalleryImage);
             }
-
-            // Create the GalleryImage object and save it to the database
-            var galleryImage = new GalleryImage
+            catch (ArgumentException ex)
             {
-                FileName = fileName,
-                Caption = caption,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            var addedGalleryImage = await _galleryImageService.AddGalleryImageAsync(galleryImage);
-            return CreatedAtAction(nameof(GetGalleryImageById), new { id = addedGalleryImage.ImageId }, addedGalleryImage);
+                return BadRequest(ex.Message); // Nếu có lỗi liên quan đến ProgramId
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
-
 
         // Update GalleryImage (Admin, NGO roles)
         [HttpPut("{id}")]
