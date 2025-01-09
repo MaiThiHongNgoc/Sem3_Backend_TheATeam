@@ -120,6 +120,22 @@ namespace backend.Services
             return await query.ToListAsync();
         }
 
+        public async Task<List<Program1>> GetProgramsByNGOIdAsync(int ngoId)
+        {
+            var programs = await _context.Program1s
+                .Where(p => p.NGOId == ngoId)
+                .ToListAsync();
+
+            return programs;
+        }
+
+
+        public async Task<NGO> GetNGOByAccountIdAsync(int accountId)
+        {
+            return await _context.NGOs.FirstOrDefaultAsync(n => n.AccountId == accountId);
+        }
+
+
         // Get NGO by Id
         public async Task<NGO?> GetNGOByIdAsync(int id)
         {
@@ -158,5 +174,7 @@ namespace backend.Services
         Task<List<NGO>> GetNGOsAsync(string searchQuery = "");
         Task<NGO?> GetNGOByIdAsync(int id);
         Task<List<NGO>> SearchNGOsAsync(string? name, string? code, bool? isApproved);
+        Task<List<Program1>> GetProgramsByNGOIdAsync(int ngoId);
+        Task<NGO> GetNGOByAccountIdAsync(int accountId);
     }
 }

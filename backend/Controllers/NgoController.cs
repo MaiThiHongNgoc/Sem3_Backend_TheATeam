@@ -94,6 +94,32 @@ namespace backend.Controllers
             }
         }
 
+        [HttpGet("{ngoId}/programs")]
+        public async Task<IActionResult> GetProgramsForNGO(int ngoId)
+        {
+            var programs = await _ngoService.GetProgramsByNGOIdAsync(ngoId);
+
+            if (programs == null || !programs.Any())
+            {
+                return NotFound(new { Message = "No programs found for this NGO." });
+            }
+
+            return Ok(programs);
+        }
+
+        [HttpGet("account/{accountId}")]
+        public async Task<IActionResult> GetNGOByAccountId(int accountId)
+        {
+            var ngo = await _ngoService.GetNGOByAccountIdAsync(accountId);
+            if (ngo == null)
+            {
+                return NotFound(new { Message = "NGO not found for this account." });
+            }
+
+            return Ok(ngo);
+        }
+
+
 
         /// <summary>
         /// Delete an NGO by its ID.
