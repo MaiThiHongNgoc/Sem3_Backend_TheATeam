@@ -164,6 +164,14 @@ namespace backend.Services
             // Implement a secure password hashing algorithm (e.g., BCrypt or SHA256)
             return password; // Placeholder
         }
+        public async Task<NGO> GetNgoByIdAsync(int NGOId)
+        {
+            // Fetch NGO data by ngoId from the database
+            return await _context.NGOs
+                .FirstOrDefaultAsync(n => n.NGOId == NGOId);
+        }
+        
+
     }
 
     public interface INGOService
@@ -176,5 +184,6 @@ namespace backend.Services
         Task<List<NGO>> SearchNGOsAsync(string? name, string? code, bool? isApproved);
         Task<List<Program1>> GetProgramsByNGOIdAsync(int ngoId);
         Task<NGO> GetNGOByAccountIdAsync(int accountId);
+        Task<NGO> GetNgoByIdAsync(int NGOId);
     }
 }

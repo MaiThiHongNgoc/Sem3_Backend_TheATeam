@@ -2,6 +2,7 @@ using backend.Models;
 using backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace backend.Controllers
@@ -67,6 +68,36 @@ namespace backend.Controllers
             }
         }
 
+        [HttpGet("get-ngo-data")]
+        public async Task<IActionResult> GetNgoData()
+        {
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity == null)
+            {
+                return Unauthorized();
+            }
+
+            // Extract AccountId from the token's claim (just like customer)
+            var accountIdClaim = identity.FindFirst("id");
+            if (accountIdClaim == null)
+            {
+                return NotFound("AccountId không tồn tại trong token.");
+            }
+
+            if (!int.TryParse(accountIdClaim.Value, out var accountId))
+            {
+                return BadRequest("AccountId không hợp lệ.");
+            }
+
+            // Call service to get NGO by AccountId (this assumes the NGO entity has AccountId)
+            var ngo = await _ngoService.GetNGOByAccountIdAsync(accountId);
+            if (ngo == null)
+            {
+                return NotFound("Không tìm thấy thông tin NGO.");
+            }
+
+            return Ok(ngo);
+        }
         /// <summary>
         /// Update an existing NGO.
         /// </summary>
