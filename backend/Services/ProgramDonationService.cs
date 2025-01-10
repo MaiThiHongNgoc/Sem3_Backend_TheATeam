@@ -49,14 +49,15 @@ namespace backend.Services
         // Get Program Donations with optional search query
         public async Task<List<ProgramDonation>> GetProgramDonationsAsync(string searchQuery = "")
         {
-            var query = _context.ProgramDonations.Include(d => d.Program1).Include(d => d.Customer).AsQueryable();
+            // var query = _context.ProgramDonations.Include(d => d.Program1).Include(d => d.Customer).AsQueryable();
 
-            if (!string.IsNullOrEmpty(searchQuery))
-            {
-                query = query.Where(d => d.PaymentStatus.Contains(searchQuery) || d.Program1.Name.Contains(searchQuery));
-            }
+            // if (!string.IsNullOrEmpty(searchQuery))
+            // {
+            //     query = query.Where(d => d.PaymentStatus.Contains(searchQuery) || d.Program1.Name.Contains(searchQuery));
+            // }
 
-            return await query.ToListAsync();
+            return await _context.ProgramDonations
+                .ToListAsync();
         }
 
         // Get Program Donation by Id
