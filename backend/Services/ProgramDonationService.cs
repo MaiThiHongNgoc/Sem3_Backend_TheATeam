@@ -13,7 +13,7 @@ namespace backend.Services
             _context = context;
         }
 
-        // Add Program Donation
+        // Thêm mới donation
         public async Task<ProgramDonation> AddProgramDonationAsync(ProgramDonation donation)
         {
             _context.ProgramDonations.Add(donation);
@@ -21,7 +21,30 @@ namespace backend.Services
             return donation;
         }
 
-        // Update Program Donation
+        // Lấy danh sách donation theo NGO và chương trình
+        public async Task<List<DonationDTO>> GetDonationsForProgramAndNGOAsync(int ngoId, int programId)
+        {
+            var donations = await _context.ProgramDonations
+                .Include(d => d.Program1)
+                .Include(d => d.Customer)
+                .ThenInclude(c => c.Account)
+                .Where(d => d.Program1!.NGOId == ngoId && d.ProgramId == programId)
+                .Select(d => new DonationDTO
+                {
+                    DonationId = d.DonationId,
+                    Amount = d.Amount,
+                    PaymentStatus = d.PaymentStatus,
+                    DonationDate = d.DonationDate,
+                    DonorName = $"{d.Customer!.FirstName} {d.Customer.LastName}",
+                    DonorEmail = d.Customer.Account!.Email,
+                    ProgramName = d.Program1!.Name
+                })
+                .ToListAsync();
+
+            return donations;
+        }
+
+        // Cập nhật donation
         public async Task<ProgramDonation> UpdateProgramDonationAsync(int id, ProgramDonation updatedDonation)
         {
             var donation = await _context.ProgramDonations.FindAsync(id);
@@ -35,7 +58,7 @@ namespace backend.Services
             return donation;
         }
 
-        // Delete Program Donation
+        // Xóa donation
         public async Task<bool> DeleteProgramDonationAsync(int id)
         {
             var donation = await _context.ProgramDonations.FindAsync(id);
@@ -46,21 +69,20 @@ namespace backend.Services
             return true;
         }
 
-        // Get Program Donations with optional search query
+        // Lấy tất cả donation (tùy chọn tìm kiếm)
         public async Task<List<ProgramDonation>> GetProgramDonationsAsync(string searchQuery = "")
         {
-            // var query = _context.ProgramDonations.Include(d => d.Program1).Include(d => d.Customer).AsQueryable();
+            var query = _context.ProgramDonations.Include(d => d.Program1).Include(d => d.Customer).AsQueryable();
 
-            // if (!string.IsNullOrEmpty(searchQuery))
-            // {
-            //     query = query.Where(d => d.PaymentStatus.Contains(searchQuery) || d.Program1.Name.Contains(searchQuery));
-            // }
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                query = query.Where(d => d.PaymentStatus.Contains(searchQuery) || d.Program1.Name.Contains(searchQuery));
+            }
 
-            return await _context.ProgramDonations
-                .ToListAsync();
+            return await query.ToListAsync();
         }
 
-        // Get Program Donation by Id
+        // Lấy donation theo ID
         public async Task<ProgramDonation?> GetProgramDonationByIdAsync(int id)
         {
             return await _context.ProgramDonations
@@ -77,5 +99,6 @@ namespace backend.Services
         Task<bool> DeleteProgramDonationAsync(int id);
         Task<List<ProgramDonation>> GetProgramDonationsAsync(string searchQuery = "");
         Task<ProgramDonation?> GetProgramDonationByIdAsync(int id);
+        Task<List<DonationDTO>> GetDonationsForProgramAndNGOAsync(int ngoId, int programId);
     }
 }

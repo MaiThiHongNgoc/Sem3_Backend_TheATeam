@@ -25,4 +25,14 @@ namespace backend.Models
 
         public ICollection<TransactionHistory> Transactions { get; set; } = new List<TransactionHistory>();
     }
+    public class DonationDTO
+    {
+        public int DonationId { get; set; }
+        public decimal Amount { get; set; }
+        public string PaymentStatus { get; set; }
+        public DateTime DonationDate { get; set; }
+        public string DonorName { get; set; } = string.Empty;
+        public string DonorEmail { get; set; } = string.Empty;
+        public string ProgramName { get; set; } = string.Empty;
+    }
 }

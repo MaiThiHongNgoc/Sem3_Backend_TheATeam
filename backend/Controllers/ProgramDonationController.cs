@@ -23,6 +23,12 @@ namespace backend.Controllers
             var donations = await _programDonationService.GetProgramDonationsAsync(searchQuery);
             return Ok(donations);
         }
+        [HttpGet("ngo/{ngoId}/program/{programId}")]
+        public async Task<IActionResult> GetDonationsForProgramAndNGO(int ngoId, int programId)
+        {
+            var donations = await _programDonationService.GetDonationsForProgramAndNGOAsync(ngoId, programId);
+            return Ok(donations);
+        }
 
         // Get Program Donation by Id (Admin, User, and NGO roles can access)
         [HttpGet("{id}")]
