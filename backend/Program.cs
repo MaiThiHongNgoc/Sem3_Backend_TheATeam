@@ -30,6 +30,12 @@ builder.Services.AddScoped<IInvitationService, InvitationService>();
 builder.Services.AddScoped<IPartnerService, PartnerService>();
 builder.Services.AddScoped<IQueryService, QueryService>();
 builder.Services.AddScoped<ITransactionHistoryService, TransactionHistoryService>();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.WriteIndented = true; // Kích hoạt pretty-print
+    });
+
 
 // Configure Authorization Policies
 builder.Services.AddAuthorization(options =>

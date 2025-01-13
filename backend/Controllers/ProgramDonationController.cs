@@ -18,10 +18,10 @@ namespace backend.Controllers
 
         // Get all Program Donations with optional search query (Admin, User, and NGO roles)
         [HttpGet]
-        public async Task<IActionResult> GetProgramDonations([FromQuery] string searchQuery = "")
+        public async Task<IActionResult> GetProgramDonationsAsync([FromQuery] string searchQuery = "")
         {
-            var donations = await _programDonationService.GetProgramDonationsAsync(searchQuery);
-            return Ok(donations);
+            var result = await _programDonationService.GetProgramDonationsAsync(searchQuery);
+            return Ok(result);
         }
         [HttpGet("ngo/{ngoId}/program/{programId}")]
         public async Task<IActionResult> GetDonationsForProgramAndNGO(int ngoId, int programId)
