@@ -34,5 +34,6 @@ namespace backend.Models
         public string DonorName { get; set; } = string.Empty;
         public string DonorEmail { get; set; } = string.Empty;
         public string ProgramName { get; set; } = string.Empty;
+        public string NgoName { get; set; } = string.Empty;
     }
 }

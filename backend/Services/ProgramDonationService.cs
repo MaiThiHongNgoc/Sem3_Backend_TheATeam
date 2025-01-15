@@ -70,21 +70,28 @@ namespace backend.Services
         }
 
         // Lấy tất cả donation (tùy chọn tìm kiếm)
-        public async Task<List<ProgramDonation>> GetProgramDonationsAsync(string searchQuery = "")
+        public async Task<List<DonationDTO>> GetProgramDonationsAsync(string searchQuery = "")
         {
-             var query = _context.ProgramDonations;
-            // .Include(d => d.Program1)
-            // .Include(d => d.Customer)
-            // .AsQueryable();
+            var query = await _context.ProgramDonations
+                .Include(d => d.Program1)
+                .Include(d => d.Customer)
+                .Include(d => d.Program1!.NGO)
+                .ThenInclude(c => c.Account)
+                .Where(d => d.Customer!.FirstName.Contains(searchQuery) || d.Customer.LastName.Contains(searchQuery))
+                .Select(d => new DonationDTO
+                {
+                    DonationId = d.DonationId,
+                    Amount = d.Amount,
+                    PaymentStatus = d.PaymentStatus,
+                    DonationDate = d.DonationDate,
+                    DonorName = $"{d.Customer!.FirstName} {d.Customer.LastName}",
+                    DonorEmail = d.Customer.Account!.Email,
+                    ProgramName = d.Program1!.Name,
+                    NgoName = d.Program1!.NGO.Name
+                })
+                .ToListAsync();
 
-            // if (!string.IsNullOrEmpty(searchQuery))
-            // {
-            //     query = query.Where(d =>
-            //         d.PaymentStatus.Contains(searchQuery) ||
-            //         d.Program1.Name.Contains(searchQuery));
-            // }
-
-            return await query.ToListAsync();
+            return query;
         }
 
         // Lấy donation theo ID
@@ -102,7 +109,7 @@ namespace backend.Services
     Task<ProgramDonation> AddProgramDonationAsync(ProgramDonation donation);
     Task<ProgramDonation> UpdateProgramDonationAsync(int id, ProgramDonation updatedDonation);
     Task<bool> DeleteProgramDonationAsync(int id);
-    Task<List<ProgramDonation>> GetProgramDonationsAsync(string searchQuery = "");
+    Task<List<DonationDTO>> GetProgramDonationsAsync(string searchQuery = "");
     Task<ProgramDonation?> GetProgramDonationByIdAsync(int id);
     Task<List<DonationDTO>> GetDonationsForProgramAndNGOAsync(int ngoId, int programId);
 }
