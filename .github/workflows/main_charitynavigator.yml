@@ -19,7 +19,7 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build with dotnet
-        run: dotnet build ./backend/Program.cs --configuration Release
+        run: dotnet build ./backend/backend.csproj --configuration Release
 
       - name: dotnet publish
         run: dotnet publish ./backend/backend.csproj -c Release -o ./published_app
