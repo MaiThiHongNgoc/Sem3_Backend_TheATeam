@@ -53,10 +53,15 @@ namespace backend.Models
         // Tính số tiền thừa nếu đóng góp vượt quá mục tiêu (Excess Amount)
         [NotMapped]
         public decimal ExcessAmount => TotalDonatedAmount > TargetAmount ? TotalDonatedAmount - TargetAmount : 0;
+        [NotMapped]
+        public string Status => DateTime.UtcNow >= StartDate && DateTime.UtcNow <= EndDate
+    ? "Ongoing"
+    : "Completed";
 
-         [NotMapped]
+
+        [NotMapped]
         public object ProgramDonations { get; internal set; }
-         [NotMapped]
+        [NotMapped]
         public object ProgramDonation { get; internal set; }
     }
 }

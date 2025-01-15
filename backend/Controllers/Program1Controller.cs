@@ -38,7 +38,7 @@ namespace backend.Controllers
 
         // Add Program1 (Admin role only)
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,NGO")]
         public async Task<IActionResult> AddProgram1([FromBody] Program1 program)
         {
             try
