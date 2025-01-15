@@ -32,7 +32,7 @@ namespace backend.Services
             }
 
             // Tạo tên file duy nhất
-            var fileName = $"{Path.GetFileNameWithoutExtension(imageFile.FileName)}_{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}";
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}";
             var uploadPath = Path.Combine(_webHostEnvironment.WebRootPath, "images");
 
             if (!Directory.Exists(uploadPath))

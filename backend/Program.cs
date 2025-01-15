@@ -121,12 +121,14 @@ builder.Logging.AddConsole();
 
 var app = builder.Build();
 
+
 // Configure Middleware Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseStaticFiles();
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
