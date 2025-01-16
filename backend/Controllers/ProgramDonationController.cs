@@ -31,6 +31,7 @@ namespace backend.Controllers
         }
 
         // Get Program Donation by Id (Admin, User, and NGO roles can access)
+        // Get Program Donation by Id (Admin, User, and NGO roles can access)
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProgramDonationById(int id)
         {
@@ -38,16 +39,20 @@ namespace backend.Controllers
             if (donation == null)
                 return NotFound("Donation not found.");
 
+            // Return donation details along with donor's full name
             return Ok(new
             {
                 donation.DonationId,
                 donation.Amount,
                 donation.PaymentStatus,
                 donation.DonationDate,
-                Program = donation.Program1.Name,
-                Customer = donation.Customer.FirstName + " " + donation.Customer.LastName
+                Program = donation.Program1?.Name,
+                Customer = donation.Customer != null 
+                    ? $"{donation.Customer.FirstName} {donation.Customer.LastName}" 
+                    : "Unknown"  // If no customer, show "Unknown"
             });
         }
+
 
         // Add Program Donation (Admin and NGO roles)
         [HttpPost]

@@ -144,13 +144,19 @@ namespace backend.Controllers
 
             var token = GenerateJwtToken(account);
 
+            // Kiểm tra xem đây có phải là lần đăng nhập đầu tiên
+            if (account.IsFirstLogin)
+            {
+                // Gửi email thông báo đăng nhập
+                var emailBody = $"Chào {request.EmailOrUsername},\n\nBạn vừa đăng nhập vào tài khoản MyApp lần đầu tiên lúc {DateTime.UtcNow}. Chúc bạn sử dụng MyApp vui vẻ!";
+                if (!SendEmail(request.EmailOrUsername, "Welcome to MyApp", emailBody))
+                    Console.WriteLine("Cảnh báo: Lỗi khi gửi email thông báo đăng nhập.");
 
-
-
-            // Gửi email thông báo đăng nhập
-            var emailBody = $"Chào {request.EmailOrUsername},\n\nBạn vừa đăng nhập vào tài khoản MyApp lúc {DateTime.UtcNow}. Nếu không phải bạn, hãy liên hệ với chúng tôi ngay lập tức.";
-            if (!SendEmail(request.EmailOrUsername, "Login Notification", emailBody))
-                Console.WriteLine("Cảnh báo: Lỗi khi gửi email thông báo đăng nhập."); // Không chặn người dùng tiếp tục sử dụng ứng dụng.
+                // Cập nhật trường IsFirstLogin thành false sau lần đăng nhập đầu tiên
+                account.IsFirstLogin = false;
+                _context.Accounts.Update(account);
+                await _context.SaveChangesAsync();
+            }
 
             return Ok(new { Token = token });
         }
@@ -163,9 +169,10 @@ namespace backend.Controllers
             var account = await _context.Accounts.FirstOrDefaultAsync(a => a.Email == request.Email);
             if (account == null) return NotFound("Email không tồn tại.");
 
+            // Tạo mã xác thực 6 số
             var resetToken = new PasswordResetToken
             {
-                Token = Guid.NewGuid().ToString(),
+                Token = GenerateResetToken(), // Tạo mã xác thực 6 số
                 ExpiryDate = DateTime.UtcNow.AddHours(1),
                 AccountId = account.AccountId
             };
@@ -196,6 +203,15 @@ namespace backend.Controllers
             await _context.SaveChangesAsync();
             return Ok("Mật khẩu đã được đặt lại.");
         }
+
+        // Tạo mã xác thực 6 số
+        private string GenerateResetToken()
+        {
+            Random random = new Random();
+            string token = random.Next(100000, 999999).ToString(); // Tạo mã ngẫu nhiên từ 100000 đến 999999
+            return token;
+        }
+
 
         // Tạo JWT Token
         private string GenerateJwtToken(Account account)
@@ -229,50 +245,83 @@ namespace backend.Controllers
             {
                 // Tạo nội dung HTML của email
                 var emailBody = $@"
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <style>
-                    body {{
-                        font-family: Arial, sans-serif;
-                        line-height: 1.6;
-                        color: #333;
-                        margin: 0;
-                        padding: 0;
-                    }}
-                    .header {{
-                        background-color: #007BFF;
-                        color: white;
-                        padding: 10px;
-                        text-align: center;
-                        font-size: 24px;
-                        font-weight: bold;
-                    }}
-                    .footer {{
-                        background-color: #f1f1f1;
-                        color: #555;
-                        padding: 10px;
-                        text-align: center;
-                        font-size: 14px;
-                    }}
-                    .content {{
-                        padding: 20px;
-                    }}
-                </style>
-            </head>
-            <body>
-                <div class='header'>MyApp</div>
-                <div class='content'>
-                    {bodyContent}
-                </div>
-                <div class='footer'>
-                    &copy; {DateTime.Now.Year} MyApp. All rights reserved.
-                </div>
-            </body>
-            </html>";
+                <!DOCTYPE html>
+                <html lang='en'>
+                <head>
+                    <meta charset='UTF-8'>
+                    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                    <style>
+                        body {{
+                            font-family: 'Arial', sans-serif;
+                            margin: 0;
+                            padding: 0;
+                            background-color: #e7eff6;
+                            color: #333;
+                        }}
+                        .email-container {{
+                            width: 100%;
+                            max-width: 600px;
+                            margin: 0 auto;
+                            background-color: #ffffff;
+                            border-radius: 8px;
+                            overflow: hidden;
+                            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                        }}
+                        .header {{
+                            background-color: #1d72b8;
+                            color: #fff;
+                            padding: 25px;
+                            text-align: center;
+                            font-size: 28px;
+                            font-weight: bold;
+                        }}
+                        .content {{
+                            padding: 30px;
+                            font-size: 16px;
+                            line-height: 1.6;
+                            color: #333;
+                        }}
+                        .content h2 {{
+                            color: #1d72b8;
+                            font-size: 22px;
+                        }}
+                        .content p {{
+                            margin: 10px 0;
+                            font-size: 16px;
+                        }}
+                        .footer {{
+                            background-color: #f4f4f9;
+                            color: #555;
+                            text-align: center;
+                            padding: 20px;
+                            font-size: 14px;
+                            border-top: 1px solid #ddd;
+                        }}
+                        .footer a {{
+                            color: #1d72b8;
+                            text-decoration: none;
+                        }}
+                    </style>
+                </head>
+                <body>
+                    <div class='email-container'>
+                        <div class='header'>
+                            Welcome to MyApp
+                        </div>
+                        <div class='content'>
+                            <h2>Hello,</h2>
+                            <p>{bodyContent}</p>
+                        </div>
+                        <div class='footer'>
+                            &copy; {DateTime.Now.Year} MyApp. All rights reserved.<br>
+                            <small>If you have any questions, feel free to contact us at <a href='mailto:support@myapp.com'>support@myapp.com</a></small>
+                        </div>
+                    </div>
+                </body>
+                </html>";
 
                 var email = new MimeMessage();
-                email.From.Add(new MailboxAddress("MyApp", _config["Email:From"]));
+                email.From.Add(new MailboxAddress("MyApp Support", _config["Email:From"]));
                 email.To.Add(new MailboxAddress("", toEmail));
                 email.Subject = subject;
 
@@ -293,7 +342,6 @@ namespace backend.Controllers
                 return false;
             }
         }
-
     }
 
 }
