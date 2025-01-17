@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace backend.Models
 {
@@ -55,13 +56,15 @@ namespace backend.Models
         public decimal ExcessAmount => TotalDonatedAmount > TargetAmount ? TotalDonatedAmount - TargetAmount : 0;
         [NotMapped]
         public string Status => DateTime.UtcNow >= StartDate && DateTime.UtcNow <= EndDate
-    ? "Ongoing"
-    : "Completed";
+    ? "Completed"
+    : "Ongoing";
 
 
-        [NotMapped]
-        public object ProgramDonations { get; internal set; }
-        [NotMapped]
-        public object ProgramDonation { get; internal set; }
+        // [NotMapped]
+        // [JsonIgnore]
+        // public object ProgramDonations { get; internal set; }
+        // [NotMapped]
+        // [JsonIgnore]
+        // public object ProgramDonation { get; internal set; }
     }
 }
